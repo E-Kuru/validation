@@ -1,26 +1,40 @@
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
+import {  useState } from 'react'
 
 import Nav from '../../components/Nav/Nav'
 
 const AddUsers = () => {
 
+  const [errors, setErrors] = useState(null)
+
     const formik = useFormik({
         initialValues: {
           name: "",
           password: "",
+          email: "",
           city: "",
 
         },
         onSubmit: values => {
-          console.log(values);
           fetch('http://localhost:5000/',{
             method : 'POST',
             headers: {
               "Content-Type": "application/json"
             },
-            body: JSON.stringify(values)
-
+            body: JSON.stringify({
+              slug : values.name.toLocaleLowerCase(),
+              ...values
+            })
+          })
+          .then(res => res.json())
+          .then(res => {
+            if(res.errors){
+              setErrors(res)
+            }
+            else{
+              alert("All's good, user added")
+            }
           })
         },
         validationSchema: Yup.object().shape({
@@ -31,7 +45,9 @@ const AddUsers = () => {
             .min(8, "password trop court")
             .required('Password is required'),
           city: Yup.string()
-            .required('City is required')
+            .required('City is required'),
+          email: Yup.string()
+            .required('Mail is required')
         }),
       })
       
@@ -63,8 +79,23 @@ const AddUsers = () => {
                 onChange={formik.handleChange}
             />
             <br />
+            <input
+                type="email"
+                name="email"
+                placeholder="Your mail"
+                value={formik.values.email}
+                onChange={formik.handleChange}
+            />
+            <br />
             <button type="submit">Submit</button>
         </form>
+        {errors && ( 
+          <>
+            {errors.errors.map(e => (
+              <h2 style={{fontSize : '30px'}}>{e.msg}</h2>
+            ))}
+          </>
+        )}
         </>
     )
 }

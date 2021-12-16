@@ -29,6 +29,7 @@ const OneUser = () => {
                 <div className="User">
                     <h2>{User.name}</h2>
                     <h3>City : {User.city}</h3>
+                    <h2>{User.email}</h2>
                     <img src={User.image} alt="Pas d'image" />
                 </div>
             </div>
